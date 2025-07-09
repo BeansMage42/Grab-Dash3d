@@ -35,10 +35,12 @@ public class AimAt : MonoBehaviour
         if(bodyFrame.bodyCount > 0)
         {
             target = bodyFrame.detectedBodies[0].Get3DWorldPosition();
+            
             if (mirrored)
             {
                 target = new Vector3(-target.x, target.y, target.z);
             }
+            Debug.Log("Target found at: " +  target);
         }
     }
 
