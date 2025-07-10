@@ -5,25 +5,27 @@ using UnityEngine;
 public class MotionController : MonoBehaviour
 {
     //ZED ASSETS
-    [SerializeField] private ZEDBodyTrackingManager btm;
-    [SerializeField] private ZEDManager zManager;
+    private ZEDBodyTrackingManager btm;
+    private ZEDManager zManager;
 
     //POSITIONS
     private Vector3 handLeftpos, handRightpos, prevLeftPos, prevRightPos;
 
     //VISUALIZATION GAME OBJECTS
-    [SerializeField] GameObject leftHandGM, rightHandGM;
+    [SerializeField] private GameObject leftHandGM, rightHandGM;
     private Transform leftTransform, rightTransform;
 
-    [SerializeField] private float zDist = 5f;
+    private float zDist = 5f;
 
     // Start is called before the first frame update
     void Start()
     {
+        btm = GameManager.Instance.btm;
+        zManager = GameManager.Instance.zManager;
         zManager.OnBodyTracking += OnTrackHands;
         leftTransform = leftHandGM.transform;
         rightTransform = rightHandGM.transform;
-
+        zDist = GameManager.Instance.GetCamDistance();
     }
 
     private void OnTrackHands(BodyTrackingFrame bodyTrackFrame)
