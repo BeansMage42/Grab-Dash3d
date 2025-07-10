@@ -12,7 +12,7 @@ public class MotionController : MonoBehaviour
     private Vector3 handLeftpos, handRightpos, prevLeftPos, prevRightPos;
 
     //VISUALIZATION GAME OBJECTS
-    [SerializeField] private GameObject leftHandGM, rightHandGM;
+    private GameObject leftHandGM, rightHandGM;
     private Transform leftTransform, rightTransform;
 
     private float zDist = 5f;
@@ -20,12 +20,15 @@ public class MotionController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        btm = GameManager.Instance.btm;
-        zManager = GameManager.Instance.zManager;
+        GameManager gameManager = GameManager.Instance;
+        leftHandGM = gameManager.handL;
+        rightHandGM = gameManager.handR;
+        btm = gameManager.btm;
+        zManager = gameManager.zManager;
         zManager.OnBodyTracking += OnTrackHands;
         leftTransform = leftHandGM.transform;
         rightTransform = rightHandGM.transform;
-        zDist = GameManager.Instance.GetCamDistance();
+        zDist = gameManager.GetCamDistance();
     }
 
     private void OnTrackHands(BodyTrackingFrame bodyTrackFrame)
@@ -56,6 +59,8 @@ public class MotionController : MonoBehaviour
             //set positions on transform
             leftTransform.position = handLeftpos;
             rightTransform.position = handRightpos;
+
+
         }
     }
 }

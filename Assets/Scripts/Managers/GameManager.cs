@@ -12,7 +12,7 @@ public class GameManager : MonoBehaviour
      public ZEDBodyTrackingManager btm;
      public ZEDManager zManager;
 
-   // public GameObject
+    public GameObject handL, handR;
     private void Awake()
     {
         if (Instance != null && Instance != this) 
