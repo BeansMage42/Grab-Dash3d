@@ -13,7 +13,7 @@ public class MotionController : MonoBehaviour
 
     //VISUALIZATION GAME OBJECTS
     private GameObject leftHandGM, rightHandGM;
-    private Rigidbody leftRb, rightRb;
+    private Transform leftTransform, rightTransform;
 
     private float zDist = 5f;
 
@@ -26,8 +26,8 @@ public class MotionController : MonoBehaviour
         btm = gameManager.btm;
         zManager = gameManager.zManager;
         zManager.OnBodyTracking += OnTrackHands;
-        leftRb = leftHandGM.GetComponent<Rigidbody>();
-        rightRb = rightHandGM.GetComponent<Rigidbody>();
+        leftTransform = leftHandGM.transform;
+        rightTransform = rightHandGM.transform;
         zDist = gameManager.GetCamDistance();
 
     }
@@ -41,8 +41,8 @@ public class MotionController : MonoBehaviour
 
             //create vector from last from to current frame and scale by screen size
             //this gives the player a full range of motion on the screen space
-            handLeftpos = prevLeftPos - bodyTrackFrame.detectedBodies[0].rawBodyData.keypoint[8] * Camera.main.orthographicSize;
-            handRightpos = prevRightPos - bodyTrackFrame.detectedBodies[0].rawBodyData.keypoint[15] * Camera.main.orthographicSize;
+             handLeftpos = prevLeftPos - bodyTrackFrame.detectedBodies[0].rawBodyData.keypoint[8] * Camera.main.orthographicSize;
+             handRightpos = prevRightPos - bodyTrackFrame.detectedBodies[0].rawBodyData.keypoint[15] * Camera.main.orthographicSize;
 
             //store current frame for the next loop
             prevLeftPos = bodyTrackFrame.detectedBodies[0].rawBodyData.keypoint[8];
@@ -51,6 +51,7 @@ public class MotionController : MonoBehaviour
             //set distance from camera
             handLeftpos.z = zDist;
             handRightpos.z = zDist;
+
             //fix y reversal issue
             handLeftpos.y *= -1;
             handRightpos.y *= -1;
@@ -59,18 +60,10 @@ public class MotionController : MonoBehaviour
 
 
 
-            leftHandGM.transform.position = handLeftpos;
-            rightHandGM.transform.position = handRightpos;
+            leftTransform.position = handLeftpos;
+            rightTransform.position = handRightpos;
         }
     }
-
-    /*private Vector3 ScaleToScreen(Vector3 vecToScale)
-    {
-        vecToScale.z = 0;
-        vecToScale.y = vecToScale.y * Screen.height;
-        vecToScale.x = vecToScale.x * Screen.width;
-        return Camera.main.ScreenToWorldPoint( vecToScale);
-    }*/
 
     private void FixedUpdate()
     {

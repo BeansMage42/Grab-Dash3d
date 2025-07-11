@@ -24,6 +24,7 @@ public class Moveable : MonoBehaviour
         List<Waypoint> points = pathManager.GetPath();
         pointA = points[0].GetPos();
         pointB = points[1].GetPos();
+
        
     }
 
