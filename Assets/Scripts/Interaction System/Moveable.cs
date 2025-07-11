@@ -4,15 +4,19 @@ using UnityEngine;
 
 public class Moveable : MonoBehaviour
 {
-
+    // Start and end points of the line
     private Vector3 pointA;
     private Vector3 pointB;
 
+
+    //controls the path
     PathManager pathManager;
 
-    //private Vector3 lastPos;
-    
+    //components
     Rigidbody rb;
+
+    //temp test
+    Vector3 prevPos;
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -20,13 +24,30 @@ public class Moveable : MonoBehaviour
         List<Waypoint> points = pathManager.GetPath();
         pointA = points[0].GetPos();
         pointB = points[1].GetPos();
+       
     }
 
     private void Update()
     {
-        rb.position = FindNearestPointOnLine(pointA, pointB, rb.position);
+      //  rb.position = FindNearestPointOnLine(pointA, pointB, rb.position);
+        //print(rb.velocity);
+        if (rb.position != prevPos)
+        {
+            rb.position = FindNearestPointOnLine(pointA, pointB, rb.position);
+        }
+        prevPos = rb.position;
+        rb.velocity = Vector3.zero;
     }
 
+    private void FixedUpdate()
+    {/*
+        if (rb.position != prevPos)
+        {
+            rb.position = FindNearestPointOnLine(pointA, pointB, rb.position);
+        }
+        prevPos = rb.position;*/
+
+    }
     public Vector3 FindNearestPointOnLine(Vector3 origin, Vector3 end, Vector3 point)
     {
         //Get heading
@@ -38,6 +59,7 @@ public class Moveable : MonoBehaviour
         Vector3 lhs = point - origin;
         float dotP = Vector3.Dot(lhs, heading);
         dotP = Mathf.Clamp(dotP, 0f, magnitudeMax);
+
         return origin + heading * dotP;
     }
 }

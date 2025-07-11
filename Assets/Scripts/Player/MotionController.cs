@@ -13,7 +13,7 @@ public class MotionController : MonoBehaviour
 
     //VISUALIZATION GAME OBJECTS
     private GameObject leftHandGM, rightHandGM;
-    private Rigidbody leftTransform, rightTransform;
+    private Rigidbody leftRb, rightRb;
 
     private float zDist = 5f;
 
@@ -26,9 +26,10 @@ public class MotionController : MonoBehaviour
         btm = gameManager.btm;
         zManager = gameManager.zManager;
         zManager.OnBodyTracking += OnTrackHands;
-        leftTransform = leftHandGM.GetComponent<Rigidbody>();
-        rightTransform = rightHandGM.GetComponent<Rigidbody>();
+        leftRb = leftHandGM.GetComponent<Rigidbody>();
+        rightRb = rightHandGM.GetComponent<Rigidbody>();
         zDist = gameManager.GetCamDistance();
+
     }
 
     private void OnTrackHands(BodyTrackingFrame bodyTrackFrame)
@@ -36,7 +37,7 @@ public class MotionController : MonoBehaviour
         if (bodyTrackFrame.bodyCount > 0)
         {
             //left hand = point 8, right hand = point 15
-            
+
 
             //create vector from last from to current frame and scale by screen size
             //this gives the player a full range of motion on the screen space
@@ -54,13 +55,24 @@ public class MotionController : MonoBehaviour
             handLeftpos.y *= -1;
             handRightpos.y *= -1;
 
-            print("right hand at: " + handRightpos + " left hand at: " + handLeftpos);
-
-            //set positions on transform
-            leftTransform.position = handLeftpos;
-            rightTransform.position = handRightpos;
+           // print("right hand at: " + handRightpos + " left hand at: " + handLeftpos);
 
 
+
+            leftHandGM.transform.position = handLeftpos;
+            rightHandGM.transform.position = handRightpos;
         }
+    }
+
+    /*private Vector3 ScaleToScreen(Vector3 vecToScale)
+    {
+        vecToScale.z = 0;
+        vecToScale.y = vecToScale.y * Screen.height;
+        vecToScale.x = vecToScale.x * Screen.width;
+        return Camera.main.ScreenToWorldPoint( vecToScale);
+    }*/
+
+    private void FixedUpdate()
+    {
     }
 }
