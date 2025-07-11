@@ -8,14 +8,21 @@ public class MotionController : MonoBehaviour
     private ZEDBodyTrackingManager btm;
     private ZEDManager zManager;
 
-    //POSITIONS
-    private Vector3 handLeftpos, handRightpos, prevLeftPos, prevRightPos;
+    Vector3 rightHandPos, leftHandPos;
+    Rigidbody rbL, rbR;
 
     //VISUALIZATION GAME OBJECTS
     private GameObject leftHandGM, rightHandGM;
     private Transform leftTransform, rightTransform;
 
     private float zDist = 5f;
+
+    //MOTION ADJUSTEMENTS
+    [Header(" physical range of motion")]
+    [Tooltip("comfortable range of motion on the x-axis in meters")]
+    [SerializeField] float physicalXRange = 0.6f; 
+    [Tooltip("comfortable range of motion on the y-axis in meters")]
+    [SerializeField] float physicalYRange = 0.5f; 
 
     // Start is called before the first frame update
     void Start()
@@ -29,43 +36,72 @@ public class MotionController : MonoBehaviour
         leftTransform = leftHandGM.transform;
         rightTransform = rightHandGM.transform;
         zDist = gameManager.GetCamDistance();
+        rbR = rightHandGM.GetComponent<Rigidbody>();
+        rbL = leftHandGM.GetComponent <Rigidbody>();
 
     }
+    /// <summary>
+    /// tracks hand movement and scales it to match screen space rather than unity world or
+    /// real world space to allow more comfortable movements and gesture control
+    /// </summary>
+    /// <param name="bodyTrackFrame"></param>
 
     private void OnTrackHands(BodyTrackingFrame bodyTrackFrame)
     {
         if (bodyTrackFrame.bodyCount > 0)
         {
-            //left hand = point 8, right hand = point 15
+            var body = bodyTrackFrame.detectedBodies[0];
+            var keypoints = body.rawBodyData.keypoint;
+
+            // Get Unity world positions
+            Vector3 leftWorld = zManager.transform.TransformPoint(keypoints[8]);
+            Vector3 rightWorld = zManager.transform.TransformPoint(keypoints[15]);
+            Vector3 torsoWorld = zManager.transform.TransformPoint(keypoints[1]);
+
+            // Get relative hand positions (offset from torso)
+            Vector3 leftOffset = leftWorld - torsoWorld;
+            Vector3 rightOffset = rightWorld - torsoWorld;
 
 
-            //create vector from last from to current frame and scale by screen size
-            //this gives the player a full range of motion on the screen space
-             handLeftpos = prevLeftPos - bodyTrackFrame.detectedBodies[0].rawBodyData.keypoint[8] * Camera.main.orthographicSize;
-             handRightpos = prevRightPos - bodyTrackFrame.detectedBodies[0].rawBodyData.keypoint[15] * Camera.main.orthographicSize;
+           
 
-            //store current frame for the next loop
-            prevLeftPos = bodyTrackFrame.detectedBodies[0].rawBodyData.keypoint[8];
-            prevRightPos = bodyTrackFrame.detectedBodies[0].rawBodyData.keypoint[15];
-            
-            //set distance from camera
-            handLeftpos.z = zDist;
-            handRightpos.z = zDist;
+            float halfYRange = physicalYRange * 0.5f;
+            float halfXRange = physicalXRange * 0.5f;
 
-            //fix y reversal issue
-            handLeftpos.y *= -1;
-            handRightpos.y *= -1;
+            //normalize it realative to screen space (treating it as points between 0 and 1)
+            //this allows it to scale up with screen size accurately
+            Vector2 leftNorm = new Vector2(
+                Mathf.Clamp01((leftOffset.x + halfXRange) / physicalXRange),
+                Mathf.Clamp01((leftOffset.y + halfYRange) / physicalYRange)
+            );
 
-           // print("right hand at: " + handRightpos + " left hand at: " + handLeftpos);
+            Vector2 rightNorm = new Vector2(
+                Mathf.Clamp01((rightOffset.x + halfXRange) / physicalXRange),
+                Mathf.Clamp01((rightOffset.y + halfYRange) / physicalYRange)
+            );
+
+            // Flips x to prevent mirroring
+            leftNorm.x = 1f - leftNorm.x;
+            rightNorm.x = 1f - rightNorm.x;
 
 
+            // Convert to screen position by scaling with screen size, making all motion relative to the screen rather than world coordinates.
+            //this allows for more comfortable and predictable range of motion
+            Vector3 leftHand = new Vector3(leftNorm.x * Screen.width, leftNorm.y * Screen.height, zDist);
+            Vector3 rightHand = new Vector3(rightNorm.x * Screen.width, rightNorm.y * Screen.height, zDist);
 
-            leftTransform.position = handLeftpos;
-            rightTransform.position = handRightpos;
+            // return to world space
+            leftHandPos = Camera.main.ScreenToWorldPoint(leftHand);
+            rightHandPos = Camera.main.ScreenToWorldPoint(rightHand);
         }
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
+        //update positions usinng rigid body to preserve colissions
+        rbL.position = leftHandPos;
+        rbR.position = rightHandPos;
+        
     }
+
 }

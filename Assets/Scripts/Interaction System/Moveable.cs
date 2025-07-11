@@ -37,6 +37,7 @@ public class Moveable : MonoBehaviour
             rb.position = FindNearestPointOnLine(pointA, pointB, rb.position);
         }
         prevPos = rb.position;
+        //zero out velocity so it doesnt keep moving
         rb.velocity = Vector3.zero;
     }
 
