@@ -13,7 +13,7 @@ public class MotionController : MonoBehaviour
 
     //VISUALIZATION GAME OBJECTS
     private GameObject leftHandGM, rightHandGM;
-    private Transform leftTransform, rightTransform;
+    private Rigidbody leftTransform, rightTransform;
 
     private float zDist = 5f;
 
@@ -26,8 +26,8 @@ public class MotionController : MonoBehaviour
         btm = gameManager.btm;
         zManager = gameManager.zManager;
         zManager.OnBodyTracking += OnTrackHands;
-        leftTransform = leftHandGM.transform;
-        rightTransform = rightHandGM.transform;
+        leftTransform = leftHandGM.GetComponent<Rigidbody>();
+        rightTransform = rightHandGM.GetComponent<Rigidbody>();
         zDist = gameManager.GetCamDistance();
     }
 
