@@ -13,7 +13,7 @@ public class ButtonInputHandler : MonoBehaviour, IPointerDownHandler, IPointerUp
     }
     public void OnPointerDown(PointerEventData eventData)
     {
-        Debug.Log("buttonPressed");
+       
         if (isJump) 
         {
             playerInputHandler.SubmitJumpRpc();

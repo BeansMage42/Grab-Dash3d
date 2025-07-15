@@ -12,7 +12,7 @@ public class PlayerInputHandler : NetworkBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //GameManager
+        
     }
 
     public override void OnNetworkSpawn()
@@ -40,7 +40,7 @@ public class PlayerInputHandler : NetworkBehaviour
     void Update()
     {
         if (!IsOwner) return;
-        //moveDir.Value = Vector3.zero;
+        /*//moveDir.Value = Vector3.zero;
         if (Input.GetKey(KeyCode.A))
         {
 
@@ -54,7 +54,7 @@ public class PlayerInputHandler : NetworkBehaviour
         {
             Debug.Log("jump keypress");
             SubmitJumpRpc();
-        }
+        }*/
         Debug.Log(moveDir.Value);
         SubmitMoveRequestRpc();
     }

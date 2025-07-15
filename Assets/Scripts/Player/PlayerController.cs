@@ -77,25 +77,6 @@ public class PlayerController : MonoBehaviour
              jumpBufferCounter = 0f;
         }
 
-        /*// -- Handle input -- 
-        if (Input.GetKey(KeyCode.A))
-        {
-            moveDir -= Vector3.right;
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-            moveDir += Vector3.right;
-        }
-        if (Input.GetKeyDown(KeyCode.W))
-        {
-            Debug.Log("jump keypress");
-            Jump();
-            
-        }*/
-
-        //moveDir = moveDir.normalized;
-        //Move();
-        
     }
 
 
