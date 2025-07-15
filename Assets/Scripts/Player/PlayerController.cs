@@ -36,7 +36,9 @@ public class PlayerController : NetworkBehaviour
     {
         
         rb = GetComponent<Rigidbody>();
+        transform.parent = null;
         transform.position = Vector3.zero + Vector3.up;
+       
         checkPoint = transform.position;
 
         
@@ -68,6 +70,7 @@ public class PlayerController : NetworkBehaviour
         // Jump with jump buffer
         if (coyoteTimeCounter > 0f && jumpBufferCounter > 0f)
         {
+            Debug.Log("jump buffer");
              rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
              rb.AddForce(Vector3.up * jumpForce);
 
@@ -85,6 +88,7 @@ public class PlayerController : NetworkBehaviour
         }
         if (Input.GetKeyDown(KeyCode.W))
         {
+            Debug.Log("jump keypress");
             Jump();
             
         }
@@ -97,6 +101,7 @@ public class PlayerController : NetworkBehaviour
 
     private void Move()
     {
+        Debug.Log("move " + moveDir);
         // Move the character by finding the target velocity
         Vector3 targetVelocity = new(speed * moveDir.x, rb.velocity.y, rb.velocity.z);
         // And then smoothing it out and applying it to the character
@@ -110,9 +115,11 @@ public class PlayerController : NetworkBehaviour
     }
     private void Jump()
     {
+        Debug.Log("Attempt jump");
         jumpBufferCounter = jumpBufferTime;
         if (coyoteTimeCounter > 0f)
         {
+            Debug.Log("jump");
             rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
             rb.AddForce(Vector3.up * jumpForce);
             jumpBufferCounter = 0f;

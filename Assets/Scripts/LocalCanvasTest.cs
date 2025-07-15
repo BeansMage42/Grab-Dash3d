@@ -16,7 +16,11 @@ public class LocalCanvasTest : NetworkBehaviour
         }
         if (!IsOwner && !IsServer && !IsHost) 
         {
-            NetworkObject.NetworkHide(NetworkManager.LocalClientId);
+            gameObject.SetActive(false) ;
+        }
+        if (IsHost)
+        {
+            holder.SetActive(false) ;
         }
     }
 
