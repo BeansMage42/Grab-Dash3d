@@ -1,20 +1,35 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;// Required when using Event data.
 
 public class ButtonInputHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
     [SerializeField] private Vector3 moveDir = Vector3.zero;
+    [SerializeField] private bool isJump;
+    [SerializeField] private PlayerInputHandler playerInputHandler;
+
+    private void Start()
+    {
+        
+    }
     public void OnPointerDown(PointerEventData eventData)
     {
-        throw new System.NotImplementedException();
+        Debug.Log("buttonPressed");
+        if (isJump) 
+        {
+            playerInputHandler.SubmitJumpRpc();
+        }
+        else
+        {
+            playerInputHandler.HorizontalButton(moveDir);
+        }
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        throw new System.NotImplementedException();
+        if (!isJump) 
+        {
+            playerInputHandler.HorizontalButton(-moveDir);
+        }
     }
 
 }

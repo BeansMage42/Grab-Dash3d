@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public class PlayerController : NetworkBehaviour 
+public class PlayerController : MonoBehaviour
 {
     Rigidbody rb;
     
@@ -29,15 +29,15 @@ public class PlayerController : NetworkBehaviour
 
     private Vector3 zeroSpeed = Vector3.zero;
 
-    
+    private void Awake()
+    {
+        rb = GetComponent<Rigidbody>();
+    }
 
     // Start is called before the first frame update
     void Start()
     {
         
-        rb = GetComponent<Rigidbody>();
-        transform.parent = null;
-        transform.position = Vector3.zero + Vector3.up;
        
         checkPoint = transform.position;
 
@@ -48,7 +48,7 @@ public class PlayerController : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!IsOwner) return;
+        
         if(transform.position.y < -20f)
         {
             transform.position = checkPoint;
@@ -77,7 +77,7 @@ public class PlayerController : NetworkBehaviour
              jumpBufferCounter = 0f;
         }
 
-        // -- Handle input -- 
+        /*// -- Handle input -- 
         if (Input.GetKey(KeyCode.A))
         {
             moveDir -= Vector3.right;
@@ -91,16 +91,17 @@ public class PlayerController : NetworkBehaviour
             Debug.Log("jump keypress");
             Jump();
             
-        }
+        }*/
 
-        moveDir = moveDir.normalized;
-        Move();
+        //moveDir = moveDir.normalized;
+        //Move();
         
     }
 
 
-    private void Move()
+    public void Move(Vector3 inputDirection)
     {
+        moveDir = inputDirection;
         Debug.Log("move " + moveDir);
         // Move the character by finding the target velocity
         Vector3 targetVelocity = new(speed * moveDir.x, rb.velocity.y, rb.velocity.z);
@@ -113,7 +114,7 @@ public class PlayerController : NetworkBehaviour
         }
 
     }
-    private void Jump()
+    public void Jump()
     {
         Debug.Log("Attempt jump");
         jumpBufferCounter = jumpBufferTime;

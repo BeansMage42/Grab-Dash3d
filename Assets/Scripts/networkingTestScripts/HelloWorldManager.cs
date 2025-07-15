@@ -26,8 +26,6 @@ namespace HelloWorld
             else
             {
                 StatusLabels();
-
-                SubmitNewPosition();
             }
 
             GUILayout.EndArea();
@@ -37,7 +35,7 @@ namespace HelloWorld
         {
             if (GUILayout.Button("Host")) m_NetworkManager.StartHost();
             if (GUILayout.Button("Client")) m_NetworkManager.StartClient();
-            if (GUILayout.Button("Server")) m_NetworkManager.StartServer();
+            //if (GUILayout.Button("Server")) m_NetworkManager.StartServer();
         }
 
         private void StatusLabels()
@@ -50,22 +48,5 @@ namespace HelloWorld
             GUILayout.Label("Mode: " + mode);
         }
 
-        private void SubmitNewPosition()
-        {
-            if (GUILayout.Button(m_NetworkManager.IsServer ? "Move" : "Request Position Change"))
-            {
-                if (m_NetworkManager.IsServer && !m_NetworkManager.IsClient)
-                {
-                    foreach (ulong uid in m_NetworkManager.ConnectedClientsIds)
-                        m_NetworkManager.SpawnManager.GetPlayerNetworkObject(uid).GetComponent<HelloWorldPlayer>().Move();
-                }
-                else
-                {
-                    var playerObject = m_NetworkManager.SpawnManager.GetLocalPlayerObject();
-                    var player = playerObject.GetComponent<HelloWorldPlayer>();
-                    player.Move();
-                }
-            }
-        }
     }
 }
