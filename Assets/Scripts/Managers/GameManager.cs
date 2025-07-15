@@ -48,7 +48,7 @@ public class GameManager : MonoBehaviour
     {
         
     }
-    private void OnGUI()
+    /*private void OnGUI()
     {
         GUILayout.BeginArea(new Rect(10, 10, 300, 300));
         if (!m_NetworkManager.IsClient && !m_NetworkManager.IsServer)
@@ -66,13 +66,10 @@ public class GameManager : MonoBehaviour
     private void StartButtons()
     {
         if (GUILayout.Button("Host")) { 
-            m_NetworkManager.StartHost();
-            levelParent.SetActive(true);
-            trackerParent.SetActive(true);
         }
         if (GUILayout.Button("Client"))
         {
-            m_NetworkManager.StartClient();
+            
             Debug.Log("client");
         }
         //if (GUILayout.Button("Server")) m_NetworkManager.StartServer();
@@ -87,8 +84,19 @@ public class GameManager : MonoBehaviour
             m_NetworkManager.NetworkConfig.NetworkTransport.GetType().Name);
         GUILayout.Label("Mode: " + mode);
     }
+*/
+    public void StartAsHost()
+    {
 
+        m_NetworkManager.StartHost();
+        levelParent.SetActive(true);
+        trackerParent.SetActive(true);
+    }
 
+    public void StartAsClient()
+    {
+        m_NetworkManager.StartClient();
+    }
 public float GetCamDistance()
     {
         return camDistance;
