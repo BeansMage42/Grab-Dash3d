@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
+#if UNITY_EDITOR
 [CustomEditor(typeof(PathManager))]
 public class PathManagerEditor : Editor
 {
@@ -139,4 +140,6 @@ public class PathManagerEditor : Editor
        
         return isChanged;
     }
+   
 }
+#endif

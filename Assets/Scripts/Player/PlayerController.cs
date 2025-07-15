@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : NetworkBehaviour 
 {
     Rigidbody rb;
+    
     Vector3 moveDir;
 
     [SerializeField] float speed = 4000f;
@@ -27,16 +29,24 @@ public class PlayerController : MonoBehaviour
 
     private Vector3 zeroSpeed = Vector3.zero;
 
+    
+
     // Start is called before the first frame update
     void Start()
     {
+        
         rb = GetComponent<Rigidbody>();
+        transform.position = Vector3.zero + Vector3.up;
         checkPoint = transform.position;
+
+        
+        
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (!IsOwner) return;
         if(transform.position.y < -20f)
         {
             transform.position = checkPoint;
@@ -58,11 +68,10 @@ public class PlayerController : MonoBehaviour
         // Jump with jump buffer
         if (coyoteTimeCounter > 0f && jumpBufferCounter > 0f)
         {
-            rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
-            rb.AddForce(Vector3.up * jumpForce);
+             rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+             rb.AddForce(Vector3.up * jumpForce);
 
-            jumpBufferCounter = 0f;
-            //Jump();
+             jumpBufferCounter = 0f;
         }
 
         // -- Handle input -- 
@@ -77,27 +86,28 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.W))
         {
             Jump();
+            
         }
 
         moveDir = moveDir.normalized;
         Move();
+        
     }
 
 
     private void Move()
     {
         // Move the character by finding the target velocity
-        Vector3 targetVelocity = new Vector3(speed * moveDir.x, rb.velocity.y,rb.velocity.z);
+        Vector3 targetVelocity = new(speed * moveDir.x, rb.velocity.y, rb.velocity.z);
         // And then smoothing it out and applying it to the character
-        rb.velocity = Vector3.SmoothDamp(rb.velocity, targetVelocity,ref zeroSpeed, deccelerateRate);
+        rb.velocity = Vector3.SmoothDamp(rb.velocity, targetVelocity, ref zeroSpeed, deccelerateRate);
         RaycastHit[] hits = new RaycastHit[2];
-        if(Physics.BoxCastNonAlloc(transform.position,gameObject.GetComponent<BoxCollider>().size/2.2f,moveDir,hits,Quaternion.identity,0.05f,groundLayer ) > 0)
+        if (Physics.BoxCastNonAlloc(transform.position, gameObject.GetComponent<BoxCollider>().size / 2.2f, moveDir, hits, Quaternion.identity, 0.05f, groundLayer) > 0)
         {
-            rb.velocity = new Vector3(0,rb.velocity.y,0);
+            rb.velocity = new Vector3(0, rb.velocity.y, 0);
         }
 
     }
-
     private void Jump()
     {
         jumpBufferCounter = jumpBufferTime;

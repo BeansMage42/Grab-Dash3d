@@ -1,11 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using Unity.Netcode;
 public class GameManager : MonoBehaviour
 {
 
     public static GameManager Instance;
+    private NetworkManager m_NetworkManager;
+
 
     [SerializeField] private float camDistance;
     //ZED ASSETS
@@ -13,6 +15,9 @@ public class GameManager : MonoBehaviour
      public ZEDManager zManager;
 
     public GameObject handL, handR;
+
+    [SerializeField] private GameObject player;
+    [SerializeField] private Vector3 playerSpawn;
     private void Awake()
     {
         if (Instance != null && Instance != this) 
@@ -23,6 +28,7 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
         }
+        m_NetworkManager = GetComponent<NetworkManager>();
     }
 
 
@@ -41,5 +47,17 @@ public class GameManager : MonoBehaviour
     public float GetCamDistance()
     {
         return camDistance;
+    }
+
+    [Rpc(SendTo.Server)]
+    public NetworkObject SpawnPlayerRpc(ulong clientId, RpcParams rpcParams = default)
+    {
+        if (!m_NetworkManager.IsServer) return null;
+        GameObject temp = Instantiate(player, playerSpawn, Quaternion.identity);
+        NetworkObject newPlayer = temp.GetComponent<NetworkObject>();
+        newPlayer.SpawnWithOwnership(clientId);
+        Debug.Log("playerSpawned");
+        
+        return newPlayer;
     }
 }
