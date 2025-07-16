@@ -2,32 +2,43 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
-
+using System;
 public class PlayerController : MonoBehaviour
 {
+
+    //Player Components
     Rigidbody rb;
     
+    //Direction of movement
     Vector3 moveDir;
 
-    [SerializeField] float speed = 4000f;
+    //Movement
+    [SerializeField] float speed = 40f;
+    [SerializeField] private float deccelerateRate;
+    private Vector3 zeroSpeed = Vector3.zero;
 
     // -- Jumping --
     [SerializeField] float jumpForce = 20f;
-    bool isGrounded;
+    //bool isGrounded;
     float coyoteTimeCounter;
     [SerializeField] float coyoteTime;
     [SerializeField] float jumpBufferTime;
     float jumpBufferCounter;
     [SerializeField] Transform jumpCheckPos;
-
     [SerializeField] LayerMask groundLayer;
+    [SerializeField] Vector3 jumpCheckYOffset = new Vector3(0,0.1f,0);
+    private float airSpeedMod = 1;
 
-    [SerializeField] private float deccelerateRate;
-
-
+    //Player Death and spawning
     private Vector3 checkPoint;
+    public delegate void OnPlayerDeath();
+    public event OnPlayerDeath onPlayerDeath;
 
-    private Vector3 zeroSpeed = Vector3.zero;
+    public delegate void OnPlayerWin();
+    public event OnPlayerWin onPlayerWin;
+
+    //Level winning
+    private bool hasFinished = false;
 
     private void Awake()
     {
@@ -37,12 +48,8 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
-       
         checkPoint = transform.position;
-
-        
-        
+        onPlayerDeath += Respawn;
     }
 
     // Update is called once per frame
@@ -51,18 +58,20 @@ public class PlayerController : MonoBehaviour
         
         if(transform.position.y < -20f)
         {
-            transform.position = checkPoint;
-            rb.velocity = Vector3.zero;
+            KillPlayer();
         }
 
         moveDir = Vector3.zero;
 
         if (Grounded())
         {
+           // Debug.Log("isgrounded");
             coyoteTimeCounter = coyoteTime;
         }
         else
-        {
+        {/*
+            rb.velocity = rb.velocity + (Physics.gravity * Time.deltaTime * 2f);
+            airSpeedMod = 0.6f;*/
             coyoteTimeCounter -= Time.deltaTime;
         }
         jumpBufferCounter -= Time.deltaTime;
@@ -79,13 +88,16 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    private void FixedUpdate()
+    {
+    }
 
     public void Move(Vector3 inputDirection)
     {
         moveDir = inputDirection;
-        Debug.Log("move " + moveDir);
+        //Debug.Log("move " + moveDir);
         // Move the character by finding the target velocity
-        Vector3 targetVelocity = new(speed * moveDir.x, rb.velocity.y, rb.velocity.z);
+        Vector3 targetVelocity = new((speed * airSpeedMod) * moveDir.x, rb.velocity.y, rb.velocity.z);
         // And then smoothing it out and applying it to the character
         rb.velocity = Vector3.SmoothDamp(rb.velocity, targetVelocity, ref zeroSpeed, deccelerateRate);
         RaycastHit[] hits = new RaycastHit[2];
@@ -109,8 +121,36 @@ public class PlayerController : MonoBehaviour
     }
 
 
-    private bool Grounded()
+    public bool Grounded()
     {
-        return Physics.CheckSphere(jumpCheckPos.position, 0.2f, groundLayer);
+        return Physics.CheckBox(gameObject.transform.position-jumpCheckYOffset, gameObject.transform.lossyScale/2.2f,gameObject.transform.rotation,groundLayer);
+    }
+
+    public void KillPlayer()
+    {
+       onPlayerDeath?.Invoke();
+    }
+
+
+    private void Respawn()
+    {
+        transform.position = checkPoint;
+        rb.velocity = Vector3.zero;
+    }
+    private void NewCheckPoint(Vector3 checkPointPos)
+    {
+        checkPoint = checkPointPos;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.gameObject.tag == "Obstacle") KillPlayer();
+        else if(other.gameObject.tag == "CheckPoint") NewCheckPoint(other.transform.position);
+        else if(other.gameObject.tag == "Exit" && !hasFinished)
+        {
+            hasFinished = true;
+            NewCheckPoint(other.transform.position);
+            GameManager.Instance.PlayerFinish();
+        }
     }
 }

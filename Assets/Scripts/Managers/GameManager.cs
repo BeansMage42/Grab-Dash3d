@@ -7,7 +7,8 @@ public class GameManager : MonoBehaviour
 
     public static GameManager Instance;
     private NetworkManager m_NetworkManager;
-
+    [SerializeField] GameObject hiddenText;
+    [SerializeField] GameObject canvas;
 
     [SerializeField] private float camDistance;
     //ZED ASSETS
@@ -21,6 +22,9 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private GameObject trackerParent;
     [SerializeField] private GameObject levelParent;
+
+    private static int numPlayers;
+    private static int playersAcrossFinish;
     private void Awake()
     {
         if (Instance != null && Instance != this) 
@@ -48,43 +52,6 @@ public class GameManager : MonoBehaviour
     {
         
     }
-    /*private void OnGUI()
-    {
-        GUILayout.BeginArea(new Rect(10, 10, 300, 300));
-        if (!m_NetworkManager.IsClient && !m_NetworkManager.IsServer)
-        {
-            StartButtons();
-        }
-        else
-        {
-            StatusLabels();
-        }
-
-        GUILayout.EndArea();
-    }
-
-    private void StartButtons()
-    {
-        if (GUILayout.Button("Host")) { 
-        }
-        if (GUILayout.Button("Client"))
-        {
-            
-            Debug.Log("client");
-        }
-        //if (GUILayout.Button("Server")) m_NetworkManager.StartServer();
-    }
-
-    private void StatusLabels()
-    {
-        var mode = m_NetworkManager.IsHost ?
-            "Host" : m_NetworkManager.IsServer ? "Server" : "Client";
-
-        GUILayout.Label("Transport: " +
-            m_NetworkManager.NetworkConfig.NetworkTransport.GetType().Name);
-        GUILayout.Label("Mode: " + mode);
-    }
-*/
     public void StartAsHost()
     {
 
@@ -97,20 +64,38 @@ public class GameManager : MonoBehaviour
     {
         m_NetworkManager.StartClient();
     }
-public float GetCamDistance()
+    public float GetCamDistance()
     {
         return camDistance;
     }
 
    // [Rpc(SendTo.Server)]
-    public GameObject SpawnPlayer( /*RpcParams rpcParams = default*/)
+    public GameObject SpawnPlayer()
     {
         
         if (!m_NetworkManager.IsServer && !m_NetworkManager.IsHost) return null;
-        
         GameObject temp = Instantiate(player, playerSpawn.position, Quaternion.identity);
         Debug.Log("playerCreated");
         
         return temp;
+    }
+
+    public int GetNumPlayers()
+    {
+        return m_NetworkManager.ConnectedClientsList.Count -1;
+    }
+    public void PlayerFinish()
+    {
+        playersAcrossFinish++;
+        if(playersAcrossFinish >= GetNumPlayers())
+        {
+            GameWin();
+        }
+    }
+
+    public void GameWin()
+    {
+        canvas.SetActive(true);
+        hiddenText.SetActive(true);
     }
 }

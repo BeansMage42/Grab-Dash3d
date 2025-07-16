@@ -9,6 +9,7 @@ public class PlayerInputHandler : NetworkBehaviour
     [SerializeField] private PlayerController player;
     [SerializeField] private GameObject holder;
     private NetworkVariable<Vector3> moveDir = new NetworkVariable<Vector3>(Vector3.zero,NetworkVariableReadPermission.Everyone ,NetworkVariableWritePermission.Owner);
+    private bool enableKeyboardControls = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -40,21 +41,13 @@ public class PlayerInputHandler : NetworkBehaviour
     void Update()
     {
         if (!IsOwner) return;
-        /*//moveDir.Value = Vector3.zero;
-        if (Input.GetKey(KeyCode.A))
-        {
+        if(Input.GetKeyDown(KeyCode.T)) enableKeyboardControls = !enableKeyboardControls;
 
-            moveDir.Value -= Vector3.right;
-        }
-        if (Input.GetKey(KeyCode.D))
+        if (enableKeyboardControls)
         {
-            moveDir.Value += Vector3.right;
+            moveDir.Value = new( Input.GetAxis("Horizontal"),0,0);
+            if(Input.GetKeyDown(KeyCode.W)||Input.GetKeyDown(KeyCode.UpArrow)) SubmitJumpRpc();
         }
-        if (Input.GetKeyDown(KeyCode.W))
-        {
-            Debug.Log("jump keypress");
-            SubmitJumpRpc();
-        }*/
         Debug.Log(moveDir.Value);
         SubmitMoveRequestRpc();
     }

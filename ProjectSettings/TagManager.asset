@@ -5,6 +5,10 @@ TagManager:
   serializedVersion: 2
   tags:
   - HelpObject
+  - Obstacle
+  - CheckPoint
+  - Exit
+  - Piston
   layers:
   - Default
   - TransparentFX
@@ -15,7 +19,7 @@ TagManager:
   - Ground
   - HandLayer
   - Player
-  - 
+  - PlayerTriggers
   - 
   - 
   - 
