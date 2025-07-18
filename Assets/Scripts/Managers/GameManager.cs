@@ -7,6 +7,9 @@ public class GameManager : MonoBehaviour
 
     public static GameManager Instance;
     private NetworkManager m_NetworkManager;
+    private SoundManager soundManager;
+
+
     [SerializeField] GameObject hiddenText;
     [SerializeField] GameObject canvas;
 
@@ -16,6 +19,7 @@ public class GameManager : MonoBehaviour
      public ZEDManager zManager;
 
     public GameObject handL, handR;
+
 
     [SerializeField] private GameObject player;
     [SerializeField] private Transform playerSpawn;
@@ -37,6 +41,7 @@ public class GameManager : MonoBehaviour
         }
         
         m_NetworkManager = GetComponent<NetworkManager>();
+        soundManager = GetComponent<SoundManager>();
     }
 
 
@@ -47,17 +52,13 @@ public class GameManager : MonoBehaviour
 
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
     public void StartAsHost()
     {
 
         m_NetworkManager.StartHost();
         levelParent.SetActive(true);
         trackerParent.SetActive(true);
+        soundManager.GameStart();
     }
 
     public void StartAsClient()
@@ -97,5 +98,6 @@ public class GameManager : MonoBehaviour
     {
         canvas.SetActive(true);
         hiddenText.SetActive(true);
+        soundManager.GameEnd();
     }
 }

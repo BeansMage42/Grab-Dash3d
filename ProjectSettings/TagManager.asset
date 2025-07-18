@@ -9,6 +9,7 @@ TagManager:
   - CheckPoint
   - Exit
   - Piston
+  - Hand
   layers:
   - Default
   - TransparentFX
